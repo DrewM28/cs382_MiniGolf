@@ -6,8 +6,8 @@ public class GolfClub : MonoBehaviour
 {
 	public Transform clubTransform;
 	public Transform gripTransform;
-	public float swingSpeed = 5f;
-	public float swingRange = 45f;
+	public float swingSpeed = 100f;
+	public float swingRange = 100f;
 	private Vector3 initialGripPosition;
 	private Vector3 initialClubRotation;
 	private bool isHovering = false;
