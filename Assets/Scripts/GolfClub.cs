@@ -23,7 +23,7 @@ public class GolfClub : MonoBehaviour
 
 	private void Update()
 	{
-		if (isHovering)
+		//if (isHovering)
 		{
 			Vector3 mousePosition = Input.mousePosition;
 			Vector3 worldMousePos = Camera.main.ScreenToWorldPoint(mousePosition);
@@ -34,7 +34,7 @@ public class GolfClub : MonoBehaviour
 			
 			float swingAmount = direction.x * swingRange;
 
-			Quaternion newRotation = Quaternion.Euler(initialClubRotation.x + swingAmount, initialClubRotation.y, initialClubRotation.z);
+			Quaternion newRotation = Quaternion.Euler(initialClubRotation.x + swingAmount , initialClubRotation.y, initialClubRotation.z);
 
 			clubTransform.rotation = newRotation;
 		}
