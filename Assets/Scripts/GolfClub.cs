@@ -44,7 +44,7 @@ public class GolfClub : MonoBehaviour
         direction.Normalize();
 
         // Calculate swing amount and clamp it
-        float swingAmount = Mathf.Clamp(direction.x * swingRange, -swingRange, swingRange);
+        float swingAmount = Mathf.Clamp(-direction.x * swingRange, -swingRange, swingRange);
 
         // Calculate target rotation
         Quaternion targetRotation = Quaternion.Euler(initialClubRotation.x + swingAmount, initialClubRotation.y, initialClubRotation.z);
