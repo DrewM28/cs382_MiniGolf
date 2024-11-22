@@ -8,65 +8,61 @@ public class GolfBall : MonoBehaviour
     private List<float> deltas = new List<float>();
     private Vector3 prevPos;
 
-    const int LOOKBACK_COUNT = 10;
+    public int lookbackCount = 10; // Number of frames to track speed
+    public float hitForceMultiplier = 10f; // Multiplier for force application
+    public float maxSpeed = 20f; // Maximum ball speed
+
     void Start()
     {
         rigid = GetComponent<Rigidbody>();
-        prevPos = new Vector3(1000,1000,0);
-        deltas.Add(1000);
-
+        prevPos = transform.position;
     }
 
     void FixedUpdate()
     {
+        // Track movement deltas
         Vector3 deltaV3 = transform.position - prevPos;
         deltas.Add(deltaV3.magnitude);
 
-        while (deltas.Count > LOOKBACK_COUNT)
+        // Keep delta list size within `lookbackCount`
+        while (deltas.Count > lookbackCount)
         {
             deltas.RemoveAt(0);
         }
-        
-        float maxDelta = 0;
 
-        foreach(float f in deltas)
+        // Calculate max delta for debug purposes
+        float maxDelta = 0f;
+        foreach (float delta in deltas)
         {
-            if(f > maxDelta) maxDelta = f;
+            if (delta > maxDelta) maxDelta = delta;
         }
 
+        // Optionally, debug log the maxDelta
+        Debug.Log($"Max Delta: {maxDelta}");
 
+        // Update previous position
+        prevPos = transform.position;
     }
-    // public float hitForceMultiplier = 2f;
-    // public float maxSpeed = 20f;
 
-    // // Start is called before the first frame update
-    // void Start()
-    // {
-    //     ballRigidbody = GetComponent<Rigidbody>();
-    // }
+    private void OnCollisionEnter(Collision collision)
+    {
+        // Check if the collision is with a golf club
+        if (collision.gameObject.CompareTag("GolfClub"))
+        {
+            Vector3 hitDirection = collision.contacts[0].normal * -1f; // Get impact direction
+            ApplyHitForce(hitDirection);
+        }
+    }
 
-    // private void OnCollision(Collision collision)
-    // {
-    //     if (collision.gameObject.CompareTag("GolfClub"))
-    //     {
-    //         Vector3 hitDirection = collision.contacts[0].normal;
+    void ApplyHitForce(Vector3 hitDirection)
+    {
+        // Apply an impulse force to the ball
+        rigid.AddForce(hitDirection * hitForceMultiplier, ForceMode.Impulse);
 
-    //         ApplyHitForce(hitDirection);
-    //     }
-    // }
-
-    // void ApplyHitForce(Vector3 hitDirection)
-    // {
-    //     ballRigidbody.AddForce(hitDirection * hitForceMultiplier, ForceMode.Impulse);
-
-    //     if (ballRigidbody.velocity.magnitude > maxSpeed)
-    //     {
-    //         ballRigidbody.velocity = ballRigidbody.velocity * maxSpeed;
-    //     }
-    // }
-    // // Update is called once per frame
-    // void Update()
-    // {
-        
-    // }
+        // Clamp the ball's velocity to `maxSpeed`
+        if (rigid.velocity.magnitude > maxSpeed)
+        {
+            rigid.velocity = rigid.velocity.normalized * maxSpeed;
+        }
+    }
 }
