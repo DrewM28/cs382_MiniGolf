@@ -53,4 +53,3 @@ public class GolfClub : MonoBehaviour
         clubTransform.rotation = Quaternion.Lerp(clubTransform.rotation, targetRotation, Time.deltaTime * swingSpeed);
     }
 }
-

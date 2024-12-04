@@ -6,6 +6,7 @@ public class GolfBall : MonoBehaviour
 {
     private Rigidbody rigid;
     private List<float> deltas = new List<float>();
+    static List<GolfBall> GOLFBALL = new List<GolfBall>();
     private Vector3 prevPos;
 
     public int lookbackCount = 10; // Number of frames to track speed
@@ -16,6 +17,7 @@ public class GolfBall : MonoBehaviour
     {
         rigid = GetComponent<Rigidbody>();
         prevPos = transform.position;
+        GOLFBALL.Add(this); // Add to static list
     }
 
     void FixedUpdate()
@@ -30,15 +32,19 @@ public class GolfBall : MonoBehaviour
             deltas.RemoveAt(0);
         }
 
-        // Calculate max delta for debug purposes
+        // Optional: Debug max delta
         float maxDelta = 0f;
         foreach (float delta in deltas)
         {
             if (delta > maxDelta) maxDelta = delta;
         }
 
-        // Optionally, debug log the maxDelta
-        Debug.Log($"Max Delta: {maxDelta}");
+        // Debug mode toggle
+        bool debugMode = false; // Set to true for debug logging
+        if (debugMode)
+        {
+            Debug.Log($"Max Delta: {maxDelta}");
+        }
 
         // Update previous position
         prevPos = transform.position;
@@ -46,7 +52,7 @@ public class GolfBall : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        // Check if the collision is with a golf club
+        Debug.Log($"Collision detected with: {collision.gameObject.name}");
         if (collision.gameObject.CompareTag("GolfClub"))
         {
             Vector3 hitDirection = collision.contacts[0].normal * -1f; // Get impact direction
@@ -57,12 +63,29 @@ public class GolfBall : MonoBehaviour
     void ApplyHitForce(Vector3 hitDirection)
     {
         // Apply an impulse force to the ball
-        rigid.AddForce(hitDirection * hitForceMultiplier, ForceMode.Impulse);
+        rigid.AddForce(hitDirection.normalized * hitForceMultiplier, ForceMode.Impulse);
 
         // Clamp the ball's velocity to `maxSpeed`
         if (rigid.velocity.magnitude > maxSpeed)
         {
             rigid.velocity = rigid.velocity.normalized * maxSpeed;
         }
+    }
+
+    // private void OnDestroy()
+    // {
+    //     GOLFBALL.Remove(this); // Remove from static list
+    // }
+
+    static public void DESTROY_GOLFBALL()
+    {
+        foreach (GolfBall g in new List<GolfBall>(GOLFBALL))
+        {
+            if (g != null && g.gameObject != null)
+            {
+                Destroy(g.gameObject);
+            }
+        }
+        GOLFBALL.Clear();
     }
 }
